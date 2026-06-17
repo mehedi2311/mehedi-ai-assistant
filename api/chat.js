@@ -56,8 +56,8 @@ const DEFAULT_PERSONAL_DATA = {
     ],
     skills: ['Python', 'Java', 'JavaScript', 'TypeScript', 'LangChain', 'FastAPI', 'Spring Boot', 'Docker', 'CI/CD', 'RAG Systems', 'Agentic AI', 'LoRA Fine-Tuning'],
     achievements: [
-        'Vice Chancellor\'s Award (Academic Excellence)',
-        'Dean\'s Award (Academic Excellence)',
+        "Vice Chancellor's Award (Academic Excellence)",
+        "Dean's Award (Academic Excellence)",
         'SEO Certification (2022)'
     ],
     leadership: [
@@ -137,7 +137,7 @@ async function callOpenRouter(message, history = []) {
         headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://mehedi-ai.vercel.app',
+            'HTTP-Referer': 'https://mehedi-ai-assistant.vercel.app',
             'X-Title': 'Mehedi AI Assistant'
         },
         body: JSON.stringify({
@@ -168,12 +168,12 @@ export default async function handler(req, res) {
     helmet()(req, res, () => {});
 
     // CORS (শুধু নির্দিষ্ট অরিজিন)
-    const allowedOrigins = ['https://mehedi-ai.vercel.app', 'http://localhost:3000'];
+    const allowedOrigins = ['https://mehedi-ai-assistant.vercel.app', 'http://localhost:3000'];
     const origin = req.headers.origin;
     if (origin && allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     } else {
-        res.setHeader('Access-Control-Allow-Origin', 'https://mehedi-ai.vercel.app');
+        res.setHeader('Access-Control-Allow-Origin', 'https://mehedi-ai-assistant.vercel.app');
     }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
