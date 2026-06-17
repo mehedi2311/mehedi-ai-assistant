@@ -1,24 +1,38 @@
-# Mehedi Hasan - Personal AI Assistant 🤖
+# Mehedi Hasan - Personal AI Assistant
 
-সর্বোচ্চ সুরক্ষিত AI চ্যাটবট যা Mehedi Hasan-এর ব্যক্তিগত তথ্যের উপর ভিত্তি করে উত্তর দেয়।
+Secure AI chatbot built with modern web technologies.
 
-## 🔐 সিকিউরিটি ফিচার
-- AES-256-GCM এনক্রিপশন (ব্যক্তিগত ডেটা)
-- রেট লিমিট (১০ রিকোয়েস্ট/মিনিট)
-- Helmet.js (XSS, MIME স্নিফিং ব্লক)
-- CSP হেডার
-- সেশন স্টোরেজ
+---
 
-## 🚀 ডিপ্লয়মেন্ট
-1. OpenRouter-এ অ্যাকাউন্ট করে API Key নিন
-2. Vercel-এ প্রজেক্ট ডিপ্লয় করুন
-3. Environment Variables সেট করুন:
-   - `OPENROUTER_API_KEY`
-   - `ENCRYPTION_SECRET` (৩২ হেক্স অক্ষর)
-   - `ENCRYPTED_PERSONAL_DATA`
+## 🚀 Overview
 
-## 🛠️ টেকনোলজি
-- Frontend: HTML, CSS, JavaScript
-- Backend: Vercel Serverless Functions
-- AI: OpenRouter (Llama 3.2)
-- Security: AES-256, Helmet, Rate Limiting
+A personal AI assistant that responds to queries about Mehedi Hasan's professional background, skills, projects, and achievements. Features a modern UI with dark/light theme support, multi-language responses, and enterprise-grade security.
+
+**Live Demo:** [https://mehedi-ai-assistant.vercel.app](https://mehedi-ai-assistant.vercel.app)
+
+---
+
+## 📦 Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | HTML5, CSS3, JavaScript (ES6+) |
+| Backend | Vercel Serverless Functions, Node.js |
+| AI | OpenRouter API, Llama 3.2 3B Instruct |
+| Security | AES-256-GCM, Helmet.js, CSP, Rate Limiting |
+| Icons | Font Awesome |
+
+---
+
+## 🔐 Security Architecture
+
+- **AES-256-GCM** – Personal data encrypted at rest
+- **Rate Limiting** – 20 requests per minute per IP
+- **Helmet.js** – XSS, MIME sniffing, clickjacking protection
+- **CSP** – Content Security Policy headers
+- **Session Storage** – Chat history not persisted long-term
+- **HTML Sanitization** – XSS prevention
+
+---
+
+## 🏗️ Architecture

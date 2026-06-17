@@ -7,3 +7,5 @@ Thumbs.db
 .vscode/
 .vercel/
 encrypt-data.js
+.vercel
+.env*

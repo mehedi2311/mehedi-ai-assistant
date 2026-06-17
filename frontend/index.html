@@ -1,38 +1,46 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mehedi Hasan - AI Assistant</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/frontend/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+    <!-- Main Application Container -->
     <div class="app-container">
-        <!-- Header -->
+        
+        <!-- Application Header -->
         <header class="app-header">
             <div class="header-content">
+                <!-- Logo and Brand -->
                 <div class="logo">
                     <i class="fas fa-robot"></i>
                     <span>Mehedi's AI</span>
                 </div>
+                
+                <!-- Header Actions -->
                 <div class="header-actions">
                     <button id="themeToggle" class="theme-btn" title="Toggle Theme">
                         <i class="fas fa-moon"></i>
                     </button>
                 </div>
             </div>
-            <p class="subtitle">আমি Mehedi-এর ব্যক্তিগত সহকারী, যেকোনো প্রশ্ন করুন</p>
+            <p class="subtitle">Your personal AI assistant for all your questions</p>
         </header>
 
-        <!-- Chat Messages -->
+        <!-- Chat Messages Container -->
         <div class="chat-container" id="chatContainer">
             <div class="messages" id="messages">
+                <!-- Initial Welcome Message -->
                 <div class="message bot-message">
                     <div class="avatar"><i class="fas fa-robot"></i></div>
                     <div class="message-content">
-                        <div class="bubble">👋 হ্যালো! আমি Mehedi-এর AI সহকারী। তার সম্পর্কে যেকোনো প্রশ্ন করতে পারেন।</div>
-                        <div class="timestamp">এখন</div>
+                        <div class="bubble">👋 Hello! I am Mehedi's AI assistant. Feel free to ask me anything about him.</div>
+                        <div class="timestamp">Now</div>
                     </div>
                 </div>
             </div>
@@ -51,17 +59,31 @@
         <!-- Input Area -->
         <div class="input-container">
             <div class="input-wrapper">
-                <textarea id="userInput" rows="1" placeholder="আপনার প্রশ্ন লিখুন..." maxlength="1000"></textarea>
-                <button id="sendBtn" class="send-btn" title="Send">
+                <!-- User Input Field -->
+                <textarea 
+                    id="userInput" 
+                    rows="1" 
+                    placeholder="Type your question here..." 
+                    maxlength="1000"
+                ></textarea>
+                
+                <!-- Send Button -->
+                <button id="sendBtn" class="send-btn" title="Send Message">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
+            
+            <!-- Input Footer -->
             <div class="input-footer">
-                <span class="char-counter"><span id="charCount">0</span>/1000</span>
-                <span class="status" id="statusText">🟢 অনলাইন</span>
+                <span class="char-counter">
+                    <span id="charCount">0</span>/1000
+                </span>
+                <span class="status" id="statusText">🟢 Online</span>
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- JavaScript -->
+    <script src="/frontend/script.js"></script>
 </body>
 </html>

@@ -2,42 +2,67 @@ import helmet from 'helmet';
 import crypto from 'crypto';
 
 // ============================================
-// 1. রেট লিমিট (প্রতি মিনিটে ১০টি রিকোয়েস্ট)
+// 1. Rate Limiting (20 requests per minute)
 // ============================================
 const rateLimit = new Map();
 
+/**
+ * Check if an IP address has exceeded the rate limit
+ * @param {string} ip - Client IP address
+ * @returns {boolean} - True if rate limited
+ */
 function isRateLimited(ip) {
     const now = Date.now();
     const windowMs = 60000;
-    if (!rateLimit.has(ip)) rateLimit.set(ip, []);
+    
+    if (!rateLimit.has(ip)) {
+        rateLimit.set(ip, []);
+    }
+    
     const timestamps = rateLimit.get(ip).filter(t => now - t < windowMs);
-    if (timestamps.length >= 10) return true;
+    
+    if (timestamps.length >= 20) {
+        return true;
+    }
+    
     timestamps.push(now);
     rateLimit.set(ip, timestamps);
     return false;
 }
 
 // ============================================
-// 2. AES-256-GCM এনক্রিপশন (আপনার ডেটার জন্য)
+// 2. AES-256-GCM Encryption for Personal Data
 // ============================================
 const ENCRYPTION_SECRET = process.env.ENCRYPTION_SECRET || 'default-secret-key-32bytes-long!!';
 const ENCRYPTED_DATA = process.env.ENCRYPTED_PERSONAL_DATA;
 
+/**
+ * Decrypt AES-256-GCM encrypted data
+ * @param {string} encryptedData - Encrypted data string (iv:authTag:encrypted)
+ * @param {string} secret - 32-byte hex secret key
+ * @returns {Object} - Decrypted JSON object
+ */
 function decryptData(encryptedData, secret) {
     const parts = encryptedData.split(':');
-    if (parts.length !== 3) throw new Error('Invalid encrypted data');
+    if (parts.length !== 3) {
+        throw new Error('Invalid encrypted data format');
+    }
+    
     const iv = Buffer.from(parts[0], 'hex');
     const authTag = Buffer.from(parts[1], 'hex');
     const encryptedText = Buffer.from(parts[2], 'hex');
+    
     const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(secret, 'hex'), iv);
     decipher.setAuthTag(authTag);
+    
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
+    
     return JSON.parse(decrypted.toString('utf8'));
 }
 
 // ============================================
-// 3. PERSONAL DATA (Mehedi Hasan - PDF থেকে নেওয়া)
+// 3. Personal Data - Mehedi Hasan
 // ============================================
 const DEFAULT_PERSONAL_DATA = {
     name: 'Mehedi Hasan',
@@ -54,7 +79,10 @@ const DEFAULT_PERSONAL_DATA = {
         'Software Developer at DataSoft System Bangladesh Limited (Sept 2025 - Present)',
         'SQA Intern at 360 Pathshala (Oct 2025 - Mar 2026)'
     ],
-    skills: ['Python', 'Java', 'JavaScript', 'TypeScript', 'LangChain', 'FastAPI', 'Spring Boot', 'Docker', 'CI/CD', 'RAG Systems', 'Agentic AI', 'LoRA Fine-Tuning'],
+    skills: [
+        'Python', 'Java', 'JavaScript', 'TypeScript', 'LangChain', 'FastAPI',
+        'Spring Boot', 'Docker', 'CI/CD', 'RAG Systems', 'Agentic AI', 'LoRA Fine-Tuning'
+    ],
     achievements: [
         "Vice Chancellor's Award (Academic Excellence)",
         "Dean's Award (Academic Excellence)",
@@ -66,7 +94,9 @@ const DEFAULT_PERSONAL_DATA = {
         'General Volunteer - Gafargaon Helpline',
         'COVID-19 Relief Activities'
     ],
-    researchInterests: ['AI Engineering', 'LLMs', 'Agentic AI', 'RAG Systems', 'LoRA/QLoRA Fine-Tuning'],
+    researchInterests: [
+        'AI Engineering', 'LLMs', 'Agentic AI', 'RAG Systems', 'LoRA/QLoRA Fine-Tuning'
+    ],
     projects: [
         'Emergency Ambulance Reservation Software (PHP, MySQL, JS)',
         'Heal Point Healthcare Management System (Android, Java, SQLite)',
@@ -79,56 +109,72 @@ const DEFAULT_PERSONAL_DATA = {
 };
 
 let PERSONAL_DATA = DEFAULT_PERSONAL_DATA;
+
+// Attempt to decrypt personal data if available
 if (ENCRYPTED_DATA && ENCRYPTION_SECRET && ENCRYPTION_SECRET.length >= 32) {
     try {
         PERSONAL_DATA = decryptData(ENCRYPTED_DATA, ENCRYPTION_SECRET);
-    } catch (e) {
-        console.error('Decryption failed, using default data:', e.message);
+        console.log('✅ Personal data decrypted successfully');
+    } catch (error) {
+        console.error('❌ Decryption failed, using default data:', error.message);
     }
 }
 
 // ============================================
-// 4. SYSTEM PROMPT (মাল্টিলিঙ্গুয়াল)
+// 4. System Prompt Generation
 // ============================================
+/**
+ * Generate the system prompt with personal data
+ * @returns {string} - Complete system prompt
+ */
 function getSystemPrompt() {
-    const d = PERSONAL_DATA;
-    return `তুমি Mehedi Hasan-এর ব্যক্তিগত AI সহকারী। তোমার নাম 'Mehedi AI'।
+    const data = PERSONAL_DATA;
+    
+    return `You are Mehedi Hasan's personal AI assistant. Your name is 'Mehedi AI'.
 
-তোমার কাছে Mehedi-এর সম্পূর্ণ তথ্য আছে:
-- নাম: ${d.name}
-- পেশা: ${d.profession}
-- ইমেইল: ${d.email}
-- ফোন: ${d.phone}
-- অবস্থান: ${d.location}
-- শিক্ষা: B.Sc CSE (CGPA: 3.21, 2025), HSC (GPA: 4.75), SSC (GPA: 5.00)
-- দক্ষতা: ${d.skills.join(', ')}
-- অভিজ্ঞতা: ${d.workExperience.join('; ')}
-- অর্জন: ${d.achievements.join('; ')}
-- নেতৃত্ব: ${d.leadership.join('; ')}
-- গবেষণা আগ্রহ: ${d.researchInterests.join(', ')}
-- প্রোজেক্ট: ${d.projects.join('; ')}
-- শখ: ${d.hobbies.join(', ')}
-- ক্যারিয়ার লক্ষ্য: ${d.careerGoals}
-- GitHub: ${d.github}
-- LinkedIn: ${d.linkedin}
+You have complete information about Mehedi:
+- Name: ${data.name}
+- Profession: ${data.profession}
+- Email: ${data.email}
+- Phone: ${data.phone}
+- Location: ${data.location}
+- Education: B.Sc CSE (CGPA: 3.21, 2025), HSC (GPA: 4.75), SSC (GPA: 5.00)
+- Skills: ${data.skills.join(', ')}
+- Experience: ${data.workExperience.join('; ')}
+- Achievements: ${data.achievements.join('; ')}
+- Leadership: ${data.leadership.join('; ')}
+- Research Interests: ${data.researchInterests.join(', ')}
+- Projects: ${data.projects.join('; ')}
+- Hobbies: ${data.hobbies.join(', ')}
+- Career Goal: ${data.careerGoals}
+- GitHub: ${data.github}
+- LinkedIn: ${data.linkedin}
 
-**গুরুত্বপূর্ণ নির্দেশনা:**
-- তুমি যে ভাষায় প্রশ্ন পাবে, ঠিক সেই ভাষায় উত্তর দেবে (বাংলা/ইংরেজি/বাংলিইশ/হিন্দি)।
-- উত্তর হবে বন্ধুত্বপূর্ণ, পেশাদার ও সংক্ষিপ্ত।
-- যদি কোনো প্রশ্নের উত্তর না জানো, স্পষ্টভাবে বলবে এবং অন্য সাহায্য দিতে পারবে কিনা জিজ্ঞেস করবে।
-- কখনো মনগড়া তথ্য দেবে না।`;
+**Important Instructions:**
+- Respond in the same language as the user's question (Bengali/English/Banglish/Hindi).
+- Keep responses friendly, professional, and concise.
+- If you don't know an answer, clearly state that and offer to help with other topics.
+- Never provide fabricated information or hallucinate.`;
 }
 
 // ============================================
-// 5. OPENROUTER API CALL
+// 5. OpenRouter API Integration
 // ============================================
+/**
+ * Call OpenRouter API with chat completion
+ * @param {string} message - User message
+ * @param {Array} history - Conversation history
+ * @returns {string} - AI response
+ */
 async function callOpenRouter(message, history = []) {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error('OPENROUTER_API_KEY is not set');
+    if (!apiKey) {
+        throw new Error('OPENROUTER_API_KEY is not set');
+    }
 
     const messages = [
         { role: 'system', content: getSystemPrompt() },
-        ...history.slice(-10),
+        ...history.slice(-10), // Only use last 10 messages for context
         { role: 'user', content: message }
     ];
 
@@ -149,57 +195,112 @@ async function callOpenRouter(message, history = []) {
         })
     });
 
+    // Handle API errors
     if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 429) throw new Error('API লিমিট শেষ। দয়া করে কিছুক্ষণ পর চেষ্টা করুন।');
-        if (response.status === 401) throw new Error('API Key সঠিক নয়।');
-        throw new Error(`API Error (${response.status})`);
+        
+        if (response.status === 429) {
+            throw new Error('API rate limit exceeded. Please try again later.');
+        }
+        if (response.status === 401) {
+            throw new Error('Invalid API key. Please check your credentials.');
+        }
+        
+        throw new Error(`API Error (${response.status}): ${errorText}`);
     }
+
     const data = await response.json();
-    if (!data.choices?.[0]?.message?.content) throw new Error('Invalid API response');
+    
+    if (!data.choices?.[0]?.message?.content) {
+        throw new Error('Invalid API response structure');
+    }
+
     return data.choices[0].message.content;
 }
 
 // ============================================
-// 6. VERCEL HANDLER (Helmet + CORS + Rate Limit)
+// 6. Vercel Serverless Function Handler
 // ============================================
+/**
+ * Main Vercel serverless function handler
+ * Handles POST requests with rate limiting, CORS, and security
+ */
 export default async function handler(req, res) {
-    // Helmet সিকিউরিটি হেডার
+    // Apply Helmet security headers
     helmet()(req, res, () => {});
 
-    // CORS (শুধু নির্দিষ্ট অরিজিন)
-    const allowedOrigins = ['https://mehedi-ai-assistant.vercel.app', 'http://localhost:3000'];
+    // CORS configuration
+    const allowedOrigins = [
+        'https://mehedi-ai-assistant.vercel.app',
+        'http://localhost:3000'
+    ];
+    
     const origin = req.headers.origin;
     if (origin && allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     } else {
         res.setHeader('Access-Control-Allow-Origin', 'https://mehedi-ai-assistant.vercel.app');
     }
+    
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+    // Handle preflight OPTIONS request
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
 
-    // রেট লিমিট চেক
-    const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+    }
+
+    // Apply rate limiting
+    const clientIp = req.headers['x-forwarded-for'] || 
+                    req.connection.remoteAddress || 
+                    'unknown';
+    
     if (isRateLimited(clientIp)) {
-        return res.status(429).json({ error: 'Too many requests. Please wait a minute.' });
+        return res.status(429).json({ 
+            error: 'Too many requests. Please wait a minute.' 
+        });
     }
 
     try {
+        // Validate request body
         const { message, history = [] } = req.body;
-        if (!message || typeof message !== 'string' || message.length > 1000) {
-            return res.status(400).json({ error: 'Invalid message' });
+        
+        if (!message || typeof message !== 'string') {
+            return res.status(400).json({ 
+                error: 'Message is required and must be a string' 
+            });
         }
+        
+        if (message.length > 1000) {
+            return res.status(400).json({ 
+                error: 'Message cannot exceed 1000 characters' 
+            });
+        }
+
+        // Process the chat request
         const reply = await callOpenRouter(message, history);
-        return res.status(200).json({ reply, status: 'success' });
+        
+        return res.status(200).json({ 
+            reply, 
+            status: 'success' 
+        });
+        
     } catch (error) {
-        console.error('Error:', error.message);
-        const status = error.message.includes('লিমিট') ? 429 :
-                      error.message.includes('Key') ? 401 : 500;
-        return res.status(status).json({ error: error.message });
+        // Log the error for debugging
+        console.error('Handler error:', error.message);
+        
+        // Determine appropriate status code
+        let statusCode = 500;
+        if (error.message.includes('rate limit')) statusCode = 429;
+        else if (error.message.includes('API key')) statusCode = 401;
+        
+        return res.status(statusCode).json({ 
+            error: error.message 
+        });
     }
 }

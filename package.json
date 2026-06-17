@@ -4,13 +4,13 @@
   "description": "Personal AI Assistant for Mehedi Hasan",
   "main": "api/chat.js",
   "scripts": {
-    "dev": "vercel dev",
+    "start": "vercel dev",
     "deploy": "vercel deploy --prod"
   },
   "dependencies": {
-    "helmet": "^7.1.0"
+    "helmet": "^7.2.0"
   },
   "devDependencies": {
-    "vercel": "^34.0.0"
+    "vercel": "^54.14.0"
   }
 }
